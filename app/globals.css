@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "LUCKY TYPEWRITER";
+  src: url("/fonts/LuckyTypewriter.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aquifer";
+  src: url("/fonts/Aquifer.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aquifer";
+  src: local("Aquifer"),
+       url("/fonts/Aquifer.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-typewriter: "LUCKY TYPEWRITER", "Special Elite", "Courier New", Courier, monospace;
+  --font-aquifer: "Aquifer", "IM Fell English", Georgia, serif;
+
+  --color-cream: #eae9da;
+  --color-muted: #838275;
+  --color-gold: #ccc654;
+  --color-dark: #040707;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100dvh;
+  background: #1a1a12;
+  overflow: hidden;
+}
+
+/* Catch-all: ensure nothing outside page-frame is ever pale */
+html::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #1a1a12;
+  z-index: -1;
+}
+
+/* Page frame — A4 portrait, centered, mobile-fills-screen */
+.page-frame {
+  position: relative;
+  width: 595px;
+  height: 842px;
+  max-width: 100vw;
+  overflow: hidden;
+  background: #2a2a22;
+}
+
+@media (max-width: 595px) {
+  .page-frame {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+
+/* Layered background helper */
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.layer-cover {
+  object-fit: cover;
+}
+
+/* Blink animation for tap CTAs */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+/* Page fade transition */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+.fade-in  { animation: fadeIn  0.6s ease-in-out forwards; }
+.fade-out { animation: fadeOut 0.6s ease-in-out forwards; }
+
+/* Typography helpers */
+.font-typewriter {
+  font-family: var(--font-typewriter);
+}
+.font-aquifer {
+  font-family: var(--font-aquifer);
+}
+
+/* Invisible text input — bottom-border only */
+.input-bare {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-muted);
+  outline: none;
+  color: var(--color-cream);
+  font-family: var(--font-aquifer);
+  font-size: 16px;
+  width: 100%;
+  caret-color: var(--color-cream);
+  resize: none;
+}
+.input-bare::placeholder {
+  color: var(--color-muted);
+}
+
+/* Remove default tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollable text area if content overflows on small screens */
+.scroll-content {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-content::-webkit-scrollbar { display: none; }

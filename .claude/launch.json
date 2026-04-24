@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "the-ring-log",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "-c",
+        "cd '/Users/astridchu/Documents/Claude/Projects/Sang Jiwa Operations/Website Assets/the-ring-log' && exec /tmp/ring-node/node /tmp/ring-node/npm-cli.js run dev"
+      ],
+      "port": 3000
+    }
+  ]
+}
