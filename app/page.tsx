@@ -81,6 +81,36 @@ export default function Home() {
       const completed = { ...sessionData, completedAt: new Date().toISOString() };
       setSessionData(completed);
       saveSession(completed);
+
+      // ── Build a readable summary for the email ──────────────────────────
+      const partner = completed.session === "eril" ? "Mar" : "Eril";
+      const lines: Record<string, string> = {
+        _subject: `Ring Log — ${completed.session === "eril" ? "Eril" : "Mar"} submitted`,
+        name: completed.session === "eril" ? "Eril" : "Mar",
+        submitted_at: new Date().toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }),
+      };
+      QUESTIONS.forEach((q) => {
+        const resolved = resolveQuestion(q, completed.session as SessionName);
+        const ans = completed.answers.find((a) => a.questionId === q.id);
+        if (!ans) return;
+        const label = `Q${resolved.number} — ${resolved.text.replace("{partner}", partner)}`;
+        const value = Array.isArray(ans.value)
+          ? ans.value.join(", ")
+          : ans.value || "(no answer)";
+        const extras = ans.extras
+          ? Object.entries(ans.extras).map(([k, v]) => `  ${k}: ${v}`).join("\n")
+          : null;
+        lines[label] = extras ? `${value}\n${extras}` : value;
+      });
+
+      // ── Send to Formspree ───────────────────────────────────────────────
+      await fetch("https://formspree.io/f/mlgaqlyn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(lines),
+      });
+
+      // ── Download files to device ────────────────────────────────────────
       await downloadPreferencesJson(completed);
       const hasPhotos = completed.answers.some((a) => (a.photos?.length ?? 0) > 0);
       if (hasPhotos) await exportSession(completed);
