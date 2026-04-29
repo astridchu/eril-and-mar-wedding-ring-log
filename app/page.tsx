@@ -83,14 +83,14 @@ export default function Home() {
       saveSession(completed);
 
       // ── Build a readable summary for the email ──────────────────────────
-      const partner = completed.session === "eril" ? "Mar" : "Eril";
+      const partner = completed.name === "eril" ? "Mar" : "Eril";
       const lines: Record<string, string> = {
-        _subject: `Ring Log — ${completed.session === "eril" ? "Eril" : "Mar"} submitted`,
-        name: completed.session === "eril" ? "Eril" : "Mar",
+        _subject: `Ring Log — ${completed.name === "eril" ? "Eril" : "Mar"} submitted`,
+        name: completed.name === "eril" ? "Eril" : "Mar",
         submitted_at: new Date().toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }),
       };
       QUESTIONS.forEach((q) => {
-        const resolved = resolveQuestion(q, completed.session as SessionName);
+        const resolved = resolveQuestion(q, completed.name as SessionName);
         const ans = completed.answers.find((a) => a.questionId === q.id);
         if (!ans) return;
         const label = `Q${resolved.number} — ${resolved.text.replace("{partner}", partner)}`;
