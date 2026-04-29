@@ -60,23 +60,15 @@ html::after {
   z-index: -1;
 }
 
-/* Page frame — A4 portrait, centered, mobile-fills-screen */
+/* Page frame — scales to fit any screen via --page-scale CSS variable set by JS */
 .page-frame {
   position: relative;
   width: 595px;
   height: 842px;
-  max-width: 100vw;
   overflow: hidden;
   background: #2a2a22;
-}
-
-@media (max-width: 595px) {
-  .page-frame {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
+  zoom: var(--page-scale, 1);
+  flex-shrink: 0;
 }
 
 
