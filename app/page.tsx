@@ -82,6 +82,22 @@ export default function Home() {
       setSessionData(completed);
       saveSession(completed);
 
+      // ── Upload photos to Cloudinary ─────────────────────────────────────
+      const CLOUD = "dptgxr38k";
+      const PRESET = "The Ring Log";
+      const uploadPhoto = async (dataUrl: string, filename: string): Promise<string> => {
+        const fd = new FormData();
+        fd.append("file", dataUrl);
+        fd.append("upload_preset", PRESET);
+        fd.append("public_id", filename.replace(/\.[^.]+$/, ""));
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
+          method: "POST",
+          body: fd,
+        });
+        const data = await res.json();
+        return data.secure_url as string;
+      };
+
       // ── Build a readable summary for the email ──────────────────────────
       const partner = completed.name === "eril" ? "Mar" : "Eril";
       const lines: Record<string, string> = {
@@ -89,10 +105,11 @@ export default function Home() {
         name: completed.name === "eril" ? "Eril" : "Mar",
         submitted_at: new Date().toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }),
       };
-      QUESTIONS.forEach((q) => {
+
+      for (const q of QUESTIONS) {
         const resolved = resolveQuestion(q, completed.name as SessionName);
         const ans = completed.answers.find((a) => a.questionId === q.id);
-        if (!ans) return;
+        if (!ans) continue;
         const label = `Q${resolved.number} — ${resolved.text.replace("{partner}", partner)}`;
         const value = Array.isArray(ans.value)
           ? ans.value.join(", ")
@@ -100,8 +117,18 @@ export default function Home() {
         const extras = ans.extras
           ? Object.entries(ans.extras).map(([k, v]) => `  ${k}: ${v}`).join("\n")
           : null;
-        lines[label] = extras ? `${value}\n${extras}` : value;
-      });
+
+        // Upload any attached photos and append URLs
+        let photoSection = "";
+        if (ans.photos && ans.photos.length > 0) {
+          const urls = await Promise.all(
+            ans.photos.map((p) => uploadPhoto(p.dataUrl, p.filename))
+          );
+          photoSection = "\n  Photos:\n" + urls.map((u) => `  ${u}`).join("\n");
+        }
+
+        lines[label] = (extras ? `${value}\n${extras}` : value) + photoSection;
+      }
 
       // ── Send to Formspree ───────────────────────────────────────────────
       await fetch("https://formspree.io/f/mlgaqlyn", {
